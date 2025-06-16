@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-cred')
         DOCKER_IMAGE = 'irphan964/jenkins-ci-cd'
+        IMAGE_TAG = 'latest'
     }
 
     stages {
@@ -15,19 +15,21 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("${DOCKER_IMAGE}:latest", "./app")
+                sh 'docker build -t $DOCKER_IMAGE:$IMAGE_TAG ./app'
+            }
+        }
+
+        stage('Login to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Push Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_CREDENTIALS) {
-                        docker.image("${DOCKER_IMAGE}:latest").push()
-                    }
-                }
+                sh 'docker push $DOCKER_IMAGE:$IMAGE_TAG'
             }
         }
     }
