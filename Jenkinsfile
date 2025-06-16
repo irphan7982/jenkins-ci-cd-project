@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')  // Jenkins credentials ID
-        DOCKER_IMAGE = 'yourdockerhubusername/simple-webapp'
+        DOCKER_HUB_CREDENTIALS = credentials('docker-cred')  // Jenkins credentials ID
+        DOCKER_IMAGE = 'irphan964/jenkins-ci-cd'
     }
 
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/your-user/jenkins-ci-cd-project.git'
+                git 'https://github.com/irphan7982/jenkins-ci-cd-project.git'
             }
         }
 
@@ -30,15 +30,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    sh 'kubectl apply -f k8s/deployment.yaml'
-                }
-            }
-        }
-    }
 
     post {
         success {
