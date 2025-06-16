@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-cred')  // Jenkins credentials ID
+        DOCKER_HUB_CREDENTIALS = credentials('docker-cred')
         DOCKER_IMAGE = 'irphan964/jenkins-ci-cd'
     }
 
@@ -24,12 +24,13 @@ pipeline {
         stage('Push to DockerHub') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker-cred') {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_CREDENTIALS) {
                         docker.image("${DOCKER_IMAGE}:latest").push()
                     }
                 }
             }
         }
+    }
 
     post {
         success {
@@ -40,4 +41,3 @@ pipeline {
         }
     }
 }
-
